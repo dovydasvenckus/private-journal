@@ -2,9 +2,11 @@ from journal import *
 from entry import *
 from sys import argv
 from Crypto.PublicKey import RSA 
+from Crypto.Cipher import AES
 import editor
 import os
 import ConfigParser
+
 
 CONFIG_FILE = '.config'
 CONFIG_SECTION = '.config'
@@ -52,11 +54,13 @@ def main():
         if os.path.exists(CONFIG_FILE):
             config = ConfigParser.ConfigParser()
             config.read(CONFIG_FILE)
-            print config.get(CONFIG_SECTION, 'private_key')
-            
+            private_key_path = config.get(CONFIG_SECTION, 'private_key')
+            public_key_path = config.get(CONFIG_SECTION, 'public_key')
+
             if len(argv) == 2:
                 if argv[1] == "add":
-                    editor.raw_input_editor()              
+                    entry = Entry(editor.raw_input_editor())              
+                    print entry
             halt = True
 
         else:
