@@ -6,45 +6,54 @@ import Crypto.Util.number
 BLOCK_SIZE = 16
 IV = '\x00' * 16
 
-def encrypt_file(rsa, input, output):
-    # Generate secret key
-    secret_key = os.urandom(BLOCK_SIZE)
-    
-    # Padding 
-    plaintext_length = (Crypto.Util.number.size(rsa.n) - 2) / 8
-    padding = '\xff' + os.urandom(BLOCK_SIZE)
-    padding += '\0' * (plaintext_length - len(padding) - len(secret_key))
+class Encryptor(object):
+    def __init__(self, rsa):
+        self.rsa = rsa
 
-    # Encrypt the secret key with RSA
-    encrypted_secret_key = rsa.encrypt(padding + secret_key, None)[0]
+    def encrypt(self, data, output):
+                
+        self.secret_key = os.urandom(BLOCK_SIZE)
 
-    # Write out the encrypted secret key, preceded by a length indication
-    output.write(str(len(encrypted_secret_key)) + "\n")
-    output.write(encrypted_secret_key)
+        self.padding = self.generate_padding()
 
-    # Encrypt the file
-    aes_engine = AES.new(secret_key, AES.MODE_CBC, IV)
+        self.encrypted_secret_key = self.rsa.encrypt(self.padding + self.secret_key, None)[0]
 
-    data = input.read()
-    output.write(aes_engine.encrypt(data + '\0' * (0 if len(data) % BLOCK_SIZE == 0 else BLOCK_SIZE - len(data) % BLOCK_SIZE)))
+        self.write_encrypted_key(output)
 
+        output.write(self.encrypt_data(data))
 
-def decrypt_file(rsa, input):
-    key_lenght = input.readline()
-    encrypted_key = input.read(int(key_lenght))
-    ciphertext = input.read()
-    padded_key = rsa.decrypt(encrypted_key)
+    def generate_padding(self):
+        plaintext_length = (Crypto.Util.number.size(self.rsa.n) - 2) / 8
+        padding = '\xff' + os.urandom(BLOCK_SIZE)
+        padding += '\0' * (plaintext_length - len(padding) - len(self.secret_key))
+        return padding
 
-    padded_key_list = list(padded_key)
-    key_start_point = None
+    def encrypt_data(self, data):
+        aes_engine = AES.new(self.secret_key, AES.MODE_CBC, IV)
+        return aes_engine.encrypt(data + '\0' * (0 if len(data) % BLOCK_SIZE == 0 else BLOCK_SIZE - len(data) % BLOCK_SIZE))
 
-    if padded_key_list[0] == '\xff':
-        for i in range (1 + BLOCK_SIZE, len(padded_key_list)):
-            if padded_key_list[i] != '\0':
-                key_start_point = i
-                break;
-    
-    key = padded_key[key_start_point:]
-    aes_engine = AES.new(key, AES.MODE_CBC, IV)
-    return aes_engine.decrypt(ciphertext)
+    def write_encrypted_key(self, output):
+        # Write out the encrypted secret key, preceded by a length indication
+        output.write(str(len(self.encrypted_secret_key)) + "\n")
+        output.write(self.encrypted_secret_key)
+
+class Decryptor(object):
+    def decrypt_file(self, rsa, input):
+        key_lenght = input.readline()
+        encrypted_key = input.read(int(key_lenght))
+        ciphertext = input.read()
+        padded_key = rsa.decrypt(encrypted_key)
+
+        padded_key_list = list(padded_key)
+        key_start_point = None
+
+        if padded_key_list[0] == '\xff':
+            for i in range (1 + BLOCK_SIZE, len(padded_key_list)):
+                if padded_key_list[i] != '\0':
+                    key_start_point = i
+                    break;
         
+        key = padded_key[key_start_point:]
+        aes_engine = AES.new(key, AES.MODE_CBC, IV)
+        return aes_engine.decrypt(ciphertext).rstrip()
+
