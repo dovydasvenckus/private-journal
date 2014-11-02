@@ -1,4 +1,4 @@
 class Journal(object):
-	def __init__ (self, name, entrys):
+	def __init__ (self, name, entries):
 		self.name = name
-		self.entrys = entrys
+		self.entries = entries

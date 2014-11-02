@@ -4,6 +4,7 @@ import unittest
 from encryption import *
 from Crypto.PublicKey import RSA
 
+
 class EncryptionTests(unittest.TestCase):
 
     def setUp(self):

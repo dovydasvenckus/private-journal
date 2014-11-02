@@ -6,6 +6,7 @@ import StringIO
 BLOCK_SIZE = 16
 IV = '\x00' * 16
 
+
 class Encryptor(object):
     def __init__(self, rsa_public_key):
         self.rsa_public_key = rsa_public_key
@@ -15,7 +16,7 @@ class Encryptor(object):
         padding = self.generate_padding(secret_key)
         encrypted_secret_key = self.rsa_public_key.encrypt(padding + secret_key, None)[0]
 
-        return self.encrypted_header(encrypted_secret_key) + self.encrypt_data(data, secret_key)
+        return self.generate_encrypted_header(encrypted_secret_key) + self.encrypt_data(data, secret_key)
 
     def generate_padding(self, key):
         plaintext_length = (Crypto.Util.number.size(self.rsa_public_key.n) - 2) / 8
@@ -28,8 +29,9 @@ class Encryptor(object):
         aes_engine = AES.new(key, AES.MODE_CBC, IV)
         return aes_engine.encrypt(data + '\0' * (0 if len(data) % BLOCK_SIZE == 0 else BLOCK_SIZE - len(data) % BLOCK_SIZE))
 
-    def encrypted_header(self, encrypted_key):
+    def generate_encrypted_header(self, encrypted_key):
         return str(len(encrypted_key)) + "\n" + encrypted_key
+
 
 class Decryptor(object):
     def __init__(self, rsa_private_key):
