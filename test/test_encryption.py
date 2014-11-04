@@ -20,10 +20,8 @@ class EncryptionTests(unittest.TestCase):
         ciphertext = self.encryptor.encrypt(self.plain)
         self.assertNotEqual(self.plain, ciphertext) 
 
-    def test_encryption_should_be_loseless(self):
+    def test_encryption_should_be_lossless(self):
         ciphertext = self.encryptor.encrypt(self.plain)
         decrypted_text = self.decryptor.decrypt(ciphertext)
         self.assertEqual(self.plain, decrypted_text)
-        
-if __name__ == '__main__':
-        unittest.main()
+
