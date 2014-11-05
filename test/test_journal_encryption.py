@@ -8,17 +8,22 @@ import os
 
 class EntriesEncryptionTests(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        cls.path = 'test/'
+        cls.file_name = 'encryped_entry'
+
         new_key = RSA.generate(1024)
-        self.public_key = new_key.publickey()
-        self.private_key = new_key
+        cls.public_key = new_key.publickey()
+        cls.private_key = new_key
 
-        self.encryptor = JournalEncryptor(self.public_key)
-        self.decryptor = JournalDecryptor(self.private_key)
-        self.entry = Entry("Some random text")
+        cls.encryptor = JournalEncryptor(cls.public_key)
+        cls.decryptor = JournalDecryptor(cls.private_key)
+        cls.entry = Entry("Some random text")
 
-        self.path = 'test/'
-        self.file_name = 'encryped_entry'
+    @classmethod
+    def tearDownClass(cls):
+        os.remove(cls.path + cls.file_name)
 
     def test_encryption_should_be_lossless(self):
         chipertext = self.encryptor.encrypt_entry(self.entry)

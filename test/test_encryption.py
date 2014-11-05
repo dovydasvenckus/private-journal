@@ -7,14 +7,15 @@ from Crypto.PublicKey import RSA
 
 class EncryptionTests(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         new_key = RSA.generate(1024) 
-        self.public_key = new_key.publickey() 
-        self.private_key = new_key 
+        cls.public_key = new_key.publickey()
+        cls.private_key = new_key
         
-        self.encryptor = Encryptor(self.public_key)
-        self.decryptor = Decryptor(self.private_key)
-        self.plain = 'Random text'
+        cls.encryptor = Encryptor(cls.public_key)
+        cls.decryptor = Decryptor(cls.private_key)
+        cls.plain = 'Random text'
 
     def test_cipther_text_differs_from_plain(self):
         ciphertext = self.encryptor.encrypt(self.plain)
