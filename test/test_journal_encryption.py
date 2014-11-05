@@ -4,6 +4,7 @@ import unittest
 from journal_encryption import *
 from Crypto.PublicKey import RSA
 import os
+import glob
 
 
 class EntriesEncryptionTests(unittest.TestCase):
@@ -24,6 +25,9 @@ class EntriesEncryptionTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         os.remove(cls.path + cls.file_name)
+        os.chdir(cls.path)
+        for file in glob.glob("*.entry"):
+            os.remove(file)
 
     def test_encryption_should_be_lossless(self):
         chipertext = self.encryptor.encrypt_entry(self.entry)
@@ -38,3 +42,8 @@ class EntriesEncryptionTests(unittest.TestCase):
         self.encryptor.encrypt_entry_to_file(self.entry, self.path, self.file_name)
         decryped_entry = self.decryptor.decrypt_entry_from_file(self.path, self.file_name)
         assert decryped_entry, self.entry
+
+    def test_file_name_should_be_generated(self):
+        file_name = self.encryptor.encrypt_entry_to_file(self.entry, self.path)
+        assert True, os.path.isfile(self.path + file_name)
+

@@ -6,10 +6,14 @@ class JournalEncryptor(Encryptor):
         return self.encrypt('' + entry.created_at.strftime("%Y-%m-%d %H:%M:%S.%f") + '\n' + entry.body)
 
     def encrypt_entry_to_file(self, entry, path='', name=None):
+        if name is None:
+            name = os.urandom(16).encode('hex') + '.entry'
+
         file = open(path + name, 'w')
         file.write(self.encrypt_entry(entry))
         file.close()
 
+        return name
 
 
 class JournalDecryptor(Decryptor):
