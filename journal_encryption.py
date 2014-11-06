@@ -1,5 +1,8 @@
 from encryption import *
 from entry import *
+import hashlib
+import uuid
+
 
 class JournalEncryptor(Encryptor):
     def encrypt_entry(self, entry):
@@ -7,7 +10,7 @@ class JournalEncryptor(Encryptor):
 
     def encrypt_entry_to_file(self, entry, path='', name=None):
         if name is None:
-            name = os.urandom(16).encode('hex') + '.entry'
+            name = hashlib.sha256(entry.created_at.strftime("%Y-%m-%d %H:%M:%S.%f") + uuid.uuid4().hex).hexdigest() + '.entry'
 
         file = open(path + name, 'w')
         file.write(self.encrypt_entry(entry))
