@@ -2,6 +2,7 @@ import sys
 sys.path.append("..")
 import unittest
 from journal_encryption import *
+from journal import *
 from Crypto.PublicKey import RSA
 import os
 import glob
@@ -13,6 +14,7 @@ class EntriesEncryptionTests(unittest.TestCase):
     def setUpClass(cls):
         cls.path = 'test/'
         cls.file_name = 'encryped_entry'
+        cls.journal_name = ".journal"
 
         new_key = RSA.generate(1024)
         cls.public_key = new_key.publickey()
@@ -21,6 +23,8 @@ class EntriesEncryptionTests(unittest.TestCase):
         cls.encryptor = JournalEncryptor(cls.public_key)
         cls.decryptor = JournalDecryptor(cls.private_key)
         cls.entry = Entry("Some random text")
+
+        cls.journal = Journal("Journal", None)
 
     @classmethod
     def tearDownClass(cls):
@@ -46,4 +50,13 @@ class EntriesEncryptionTests(unittest.TestCase):
     def test_file_name_should_be_generated(self):
         file_name = self.encryptor.encrypt_entry_to_file(self.entry, self.path)
         assert True, os.path.isfile(self.path + file_name)
+
+    def test_journal_encryption_should_be_loseless(self):
+        encrypted_journal = self.encryptor.encrypt_journal(self.journal)
+        assert encrypted_journal, self.decryptor.decrypt_journal(encrypted_journal)
+
+    def test_journal_should_be_loseless_after_reading_from_file(self):
+        self.encryptor.encrypt_journal_to_file(self.journal, self.path)
+        decrypted_journal = self.decryptor.decrypt_journal_from_file(self.path)
+        assert decrypted_journal, self.journal
 
