@@ -1,6 +1,7 @@
 import os
 from Crypto.Cipher import AES
 import Crypto.Util.number
+import Crypto.PublicKey.RSA
 import StringIO
 
 BLOCK_SIZE = 16
@@ -8,8 +9,11 @@ IV = '\x00' * 16
 
 
 class Encryptor(object):
-    def __init__(self, rsa_public_key):
-        self.rsa_public_key = rsa_public_key
+    def __init__(self, rsa_public_key, path=None):
+        if rsa_public_key is None and path is not None:
+            self.rsa_public_key = self.read_public_key(path)
+        else:
+            self.rsa_public_key = rsa_public_key
 
     def encrypt(self, data):
         secret_key = os.urandom(BLOCK_SIZE)
@@ -32,13 +36,21 @@ class Encryptor(object):
     def generate_encrypted_header(self, encrypted_key):
         return str(len(encrypted_key)) + "\n" + encrypted_key
 
+    @staticmethod
+    def read_public_key(path):
+        public_key = open(path).read()
+        return Crypto.PublicKey.RSA.importKey(public_key)
+
 
 class Decryptor(object):
-    def __init__(self, rsa_private_key):
-        self.rsa_private_key = rsa_private_key
+    def __init__(self, rsa_private_key, path=None):
+        if rsa_private_key is None and path is not None:
+            self.rsa_private_key = self.read_private_key(path)
+        else:
+            self.rsa_private_key = rsa_private_key
 
     def decrypt(self, encrypted_msg):
-        key_lenght, encrypted_key, ciphertext = self.parse_encrypted_message(encrypted_msg)
+        key_length, encrypted_key, ciphertext = self.parse_encrypted_message(encrypted_msg)
         padded_key = self.rsa_private_key.decrypt(encrypted_key)
         key = self.remove_padding(padded_key)
         aes_engine = AES.new(key, AES.MODE_CBC, IV)
@@ -48,11 +60,11 @@ class Decryptor(object):
     def parse_encrypted_message(self, encrypted_msg):
         input = StringIO.StringIO(encrypted_msg)
 
-        key_lenght = input.readline()
-        encrypted_key = input.read(int(key_lenght))
+        key_length = input.readline()
+        encrypted_key = input.read(int(key_length))
         ciphertext = input.read()
 
-        return key_lenght, encrypted_key, ciphertext
+        return key_length, encrypted_key, ciphertext
 
     def remove_padding(self, padded_key):
         padded_key_list = list(padded_key)
@@ -65,3 +77,8 @@ class Decryptor(object):
                     break
 
         return padded_key[key_start_point:]
+
+    @staticmethod
+    def read_private_key(path):
+        private_key = open(path).read()
+        return Crypto.PublicKey.RSA.importKey(private_key)
