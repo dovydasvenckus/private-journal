@@ -30,7 +30,7 @@ class JournalEncryptor(Encryptor):
         if name is None:
             name = JOURNAL_FILE_NAME
 
-        open(path + name, 'w').write(self.encrypt_journal(journal))
+        open(os.path.join(path + name), 'w').write(self.encrypt_journal(journal))
 
         return name
 

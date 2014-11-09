@@ -43,9 +43,9 @@ class Encryptor(object):
 
 
 class Decryptor(object):
-    def __init__(self, rsa_private_key, path=None):
+    def __init__(self, rsa_private_key, path=None, password=None):
         if rsa_private_key is None and path is not None:
-            self.rsa_private_key = self.read_private_key(path)
+            self.rsa_private_key = self.read_private_key(path, password)
         else:
             self.rsa_private_key = rsa_private_key
 
@@ -79,6 +79,11 @@ class Decryptor(object):
         return padded_key[key_start_point:]
 
     @staticmethod
-    def read_private_key(path):
-        private_key = open(path).read()
-        return Crypto.PublicKey.RSA.importKey(private_key)
+    def read_private_key(path, password=None):
+        private_key_string = open(path).read()
+        if password is None:
+            private_key = Crypto.PublicKey.RSA.importKey(private_key_string)
+        else:
+            private_key = Crypto.PublicKey.RSA.importKey(private_key_string, password)
+
+        return private_key
