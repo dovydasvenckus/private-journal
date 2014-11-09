@@ -22,13 +22,15 @@ class EntriesEncryptionTests(unittest.TestCase):
 
         cls.encryptor = JournalEncryptor(cls.public_key)
         cls.decryptor = JournalDecryptor(cls.private_key)
-        cls.entry = Entry("Some random text")
-
         cls.journal = Journal("Journal", None)
+
+        cls.entry = Entry("Some random text", None, cls.journal.identifier)
+
 
     @classmethod
     def tearDownClass(cls):
         os.remove(cls.path + cls.file_name)
+        os.remove(cls.path + cls.journal_name)
         os.chdir(cls.path)
         for file in glob.glob("*.entry"):
             os.remove(file)

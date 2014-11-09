@@ -10,7 +10,8 @@ JOURNAL_FILE_NAME = '.journal'
 
 class JournalEncryptor(Encryptor):
     def encrypt_entry(self, entry):
-        return self.encrypt('' + entry.created_at.strftime("%Y-%m-%d %H:%M:%S.%f") + '\n' + entry.body)
+        return self.encrypt('' + entry.created_at.strftime(
+            "%Y-%m-%d %H:%M:%S.%f") + '\n' + entry.journal_identifier + '\n' + entry.body)
 
     def encrypt_entry_to_file(self, entry, path='', name=None):
         if name is None:
@@ -18,9 +19,7 @@ class JournalEncryptor(Encryptor):
             name = hashlib.sha256(
                 entry.created_at.strftime("%Y-%m-%d %H:%M:%S.%f") + salt).hexdigest() + FILE_EXTENSION
 
-        file = open(path + name, 'w')
-        file.write(self.encrypt_entry(entry))
-        file.close()
+        open(os.path.join(path + name), 'w').write(self.encrypt_entry(entry))
 
         return name
 
@@ -31,9 +30,7 @@ class JournalEncryptor(Encryptor):
         if name is None:
             name = JOURNAL_FILE_NAME
 
-        file = open(path + name, 'w')
-        file.write(self.encrypt_journal(journal))
-        file.close()
+        open(path + name, 'w').write(self.encrypt_journal(journal))
 
         return name
 
@@ -43,9 +40,10 @@ class JournalDecryptor(Decryptor):
         plain_text = self.decrypt(encrypted_entry)
         stream = StringIO.StringIO(plain_text)
         date = stream.readline().rstrip()
+        identifier = stream.readline().rstrip()
         text = stream.read()
 
-        return Entry(text, datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f"))
+        return Entry(text, datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f"), identifier)
 
     def decrypt_entry_from_file(self, path, name):
         encrypted_message = open(path + name).read()
