@@ -2,8 +2,6 @@ from journal import *
 from entry import *
 from journal_encryption import *
 from sys import argv
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import *
 import getpass
 import editor
 import os
@@ -57,7 +55,7 @@ def main():
 
         if os.path.exists(CONFIG_FILE):
             configurator = Configurator(CONFIG_FILE, CONFIG_SECTION)
-            private_key_path, public_key_path = configurator.get_keys_paths()
+            private_key_path = configurator.private_key_path
 
             if len(argv) == 3:
                 if argv[1] == "list":
@@ -67,17 +65,6 @@ def main():
         else:
             first_init()
 
-
-def list(path):
-    configurator = Configurator(CONFIG_FILE, CONFIG_SECTION)
-    private_key_path, public_key_path = configurator.get_keys_paths()
-    password = getpass.getpass()
-    decryptor = JournalDecryptor(None, private_key_path, password)
-
-    os.chdir(path)
-
-    for file in glob.glob('*.entry'):
-        print decryptor.decrypt_entry_from_file('', file).created_at
 
 
 if __name__ == "__main__":
