@@ -15,5 +15,5 @@ class Entry(object):
         return "CreatedAt: %s\nBody:\n%s" % (self.created_at, self.body)
 
     def __eq__(self, other):
-        return self.body == other.body and self.created_at == other.created_at and self.journal_identifier == other.journal_identifier
-
+        return self.body == other.body and self.created_at == other.created_at \
+               and self.journal_identifier == other.journal_identifier

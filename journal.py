@@ -1,5 +1,7 @@
 import hashlib
 import uuid
+from operator import attrgetter
+from Colors import Colors
 
 
 class Journal(object):
@@ -24,6 +26,9 @@ class Journal(object):
 
     def __str__(self):
         message = ""
+        self.entries = sorted(self.entries, key=attrgetter('created_at'))
+
         for entry in self.entries:
-            message += entry.created_at.strftime("%Y-%m-%d %H:%M:%S.%f") + '\n'
+            message += Colors.BLUE + entry.created_at.strftime("%Y-%m-%d %H:%M:%S.%f") + Colors.ENDC + '\n' + \
+                       entry.body.splitlines()[0][0:80] + '\n\n'
         return message
