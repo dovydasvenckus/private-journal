@@ -19,7 +19,7 @@ class JournalEncryptor(Encryptor):
             name = hashlib.sha256(
                 entry.created_at.strftime("%Y-%m-%d %H:%M:%S.%f") + salt).hexdigest() + FILE_EXTENSION
 
-        open(os.path.join(path + name), 'w').write(self.encrypt_entry(entry))
+        open(os.path.join(path, name), 'w').write(self.encrypt_entry(entry))
 
         return name
 
@@ -30,7 +30,7 @@ class JournalEncryptor(Encryptor):
         if name is None:
             name = JOURNAL_FILE_NAME
 
-        open(os.path.join(path + name), 'w').write(self.encrypt_journal(journal))
+        open(os.path.join(path, name), 'w').write(self.encrypt_journal(journal))
 
         return name
 
@@ -46,7 +46,7 @@ class JournalDecryptor(Decryptor):
         return Entry(text, datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f"), identifier)
 
     def decrypt_entry_from_file(self, path, name):
-        encrypted_message = open(path + name).read()
+        encrypted_message = open(os.path.join(path, name)).read()
 
         return self.decrypt_entry(encrypted_message)
 
@@ -59,6 +59,6 @@ class JournalDecryptor(Decryptor):
         return Journal(name, None, identifier)
 
     def decrypt_journal_from_file(self, path='', name=JOURNAL_FILE_NAME):
-        encrypted_message = open(path + name).read()
+        encrypted_message = open(os.path.join(path, name)).read()
 
         return self.decrypt_journal(encrypted_message)

@@ -66,6 +66,23 @@ def main():
             first_init()
 
 
+def list(path):
+    configurator = Configurator(CONFIG_FILE, CONFIG_SECTION)
+    private_key_path = configurator.private_key_path
+    password = getpass.getpass()
+    decryptor = JournalDecryptor(None, private_key_path, password)
+    journal = decryptor.decrypt_journal_from_file(configurator.default_journal, '.journal')
+    print journal.identifier
+
+    os.chdir(path)
+
+    for file in glob.glob('*.entry'):
+        entry = decryptor.decrypt_entry_from_file('', file)
+        if entry.journal_identifier == journal.identifier:
+            journal.add_entry(entry)
+
+    print journal.__str__()
+
 
 if __name__ == "__main__":
     main()
