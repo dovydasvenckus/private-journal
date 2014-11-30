@@ -60,6 +60,10 @@ def main():
             if len(argv) == 3:
                 if argv[1] == "list":
                     list(argv[2])
+
+            elif len(argv) == 2:
+                if argv[1] == "add":
+                    add()
             halt = True
 
         else:
@@ -83,6 +87,19 @@ def list(path):
 
     print journal.__str__()
 
+
+def add():
+    configurator = Configurator(CONFIG_FILE, CONFIG_SECTION)
+    public_key_path = configurator.public_key_path
+    encryptor = JournalEncryptor(None, public_key_path)
+    decryptor = JournalDecryptor(None, configurator.private_key_path, getpass.getpass())
+
+    journal = decryptor.decrypt_journal_from_file(configurator.default_journal, '.journal')
+    body = editor.raw_input_editor()
+
+    entry = Entry(body, datetime.datetime.now(), journal.identifier)
+    entry.journal_identifier = journal.identifier
+    encryptor.encrypt_entry_to_file(entry, configurator.default_journal)
 
 if __name__ == "__main__":
     main()
