@@ -57,25 +57,31 @@ def main():
             configurator = Configurator(CONFIG_FILE, CONFIG_SECTION)
             private_key_path = configurator.private_key_path
 
-            if len(argv) == 3:
+            if len(argv) == 2:
+                if argv[1] == "add":
+                    add()
+                if argv[1] == "list":
+                    list()
+            elif len(argv) == 3:
                 if argv[1] == "list":
                     list(argv[2])
 
-            elif len(argv) == 2:
-                if argv[1] == "add":
-                    add()
             halt = True
 
         else:
             first_init()
 
 
-def list(path):
+def list(path=None):
     configurator = Configurator(CONFIG_FILE, CONFIG_SECTION)
     private_key_path = configurator.private_key_path
     password = getpass.getpass()
     decryptor = JournalDecryptor(None, private_key_path, password)
-    journal = decryptor.decrypt_journal_from_file(configurator.default_journal, '.journal')
+
+    if path is None:
+        path = configurator.default_journal
+
+    journal = decryptor.decrypt_journal_from_file(path, '.journal')
     print journal.identifier
 
     os.chdir(path)
