@@ -103,9 +103,12 @@ def add():
     journal = decryptor.decrypt_journal_from_file(configurator.default_journal, '.journal')
     body = editor.raw_input_editor()
 
-    entry = Entry(body, datetime.datetime.now(), journal.identifier)
-    entry.journal_identifier = journal.identifier
-    encryptor.encrypt_entry_to_file(entry, configurator.default_journal)
+    if len(body) > 0:
+        entry = Entry(body, datetime.datetime.now(), journal.identifier)
+        entry.journal_identifier = journal.identifier
+        encryptor.encrypt_entry_to_file(entry, configurator.default_journal)
+    else:
+        print('Entry should not be empty')
 
 if __name__ == "__main__":
     main()
