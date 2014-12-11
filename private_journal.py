@@ -37,9 +37,9 @@ def first_init():
         except IOError:
             print "File do not exist"
 
-    config.set(CONFIG_FILE, 'private_key', private_path)
-    config.set(CONFIG_FILE, 'public_key', public_path)
-    config.set(CONFIG_FILE, 'default_journal', 'journal')
+    config.set(CONFIG_SECTION, 'private_key', private_path)
+    config.set(CONFIG_SECTION, 'public_key', public_path)
+    config.set(CONFIG_SECTION, 'default_journal', 'journal')
     
     if not os.path.exists('journal'):
         os.makedirs('journal')
