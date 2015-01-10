@@ -62,3 +62,5 @@ class EntriesEncryptionTests(unittest.TestCase):
         decrypted_journal = self.decryptor.decrypt_journal_from_file(self.path)
         assert decrypted_journal, self.journal
 
+if __name__  == '__main__':
+    unittest.main()

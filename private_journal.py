@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from journal import *
 from entry import *
 from journal_encryption import *
@@ -20,15 +22,15 @@ def first_init():
     print '*' * 8, 'First time setup', '*' * 8
     config.add_section(CONFIG_SECTION)
     private_path_valid = False
-    public_path_valid = False 
-    
+    public_path_valid = False
+
     while not private_path_valid or not public_path_valid:
-        
+
         try:
             if not private_path_valid:
                 private_path = raw_input('Please enter valid private key path: ')
-                key = open(private_path, "r").read() 
-                private_path_valid = True 
+                key = open(private_path, "r").read()
+                private_path_valid = True
 
             if not public_path_valid and private_path_valid:
                 public_path = raw_input ('Please enter valid public key path:')
@@ -40,7 +42,7 @@ def first_init():
     config.set(CONFIG_SECTION, 'private_key', private_path)
     config.set(CONFIG_SECTION, 'public_key', public_path)
     config.set(CONFIG_SECTION, 'default_journal', 'journal')
-    
+
     if not os.path.exists('journal'):
         os.makedirs('journal')
 

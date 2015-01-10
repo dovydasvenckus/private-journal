@@ -12,7 +12,7 @@ class EncryptionTests(unittest.TestCase):
         cls.new_key = RSA.generate(1024)
         cls.public_key = cls.new_key.publickey()
         cls.private_key = cls.new_key
-        
+
         cls.encryptor = Encryptor(cls.public_key)
         cls.decryptor = Decryptor(cls.private_key)
         cls.plain = 'Random text'
@@ -31,7 +31,7 @@ class EncryptionTests(unittest.TestCase):
 
     def test_cipther_text_differs_from_plain(self):
         ciphertext = self.encryptor.encrypt(self.plain)
-        self.assertNotEqual(self.plain, ciphertext) 
+        self.assertNotEqual(self.plain, ciphertext)
 
     def test_encryption_should_be_lossless(self):
         ciphertext = self.encryptor.encrypt(self.plain)
@@ -45,3 +45,6 @@ class EncryptionTests(unittest.TestCase):
     def test_read_private_key_from_file(self):
         private_key = self.decryptor.read_private_key(self.path + self.private_key_name)
         assert self.private_key, private_key
+
+if __name__ == '__main__':
+    unittest.main()

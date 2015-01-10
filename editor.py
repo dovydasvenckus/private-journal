@@ -17,6 +17,7 @@ def raw_input_editor(default=None, editor=None):
 def get_editor():
     return (os.environ.get('VISUAL')
         or os.environ.get('EDITOR')
-        or 'vi')
+        or 'vim'
+        or 'nano')
 
 
