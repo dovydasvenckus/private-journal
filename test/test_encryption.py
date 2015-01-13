@@ -17,12 +17,15 @@ class EncryptionTests(unittest.TestCase):
         cls.decryptor = Decryptor(cls.private_key)
         cls.plain = 'Random text'
 
-        cls.path = 'test/'
+        cls.path = 'testData/'
         cls.public_key_name = 'public_key'
         cls.private_key_name = 'private_key'
 
-        open(cls.path + cls.public_key_name, 'w').write(cls.public_key.exportKey())
-        open(cls.path + cls.private_key_name, 'w').write(cls.private_key.exportKey())
+        if not os.path.exists(cls.path):
+            os.mkdir(cls.path)
+
+        open(os.path.join(cls.path, cls.public_key_name), 'w').write(cls.public_key.exportKey())
+        open(os.path.join(cls.path + cls.private_key_name), 'w').write(cls.private_key.exportKey())
 
     @classmethod
     def tearDownClass(cls):
