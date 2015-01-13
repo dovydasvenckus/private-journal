@@ -2,7 +2,6 @@ import sys
 sys.path.append("..")
 import unittest
 from journal_encryption import *
-from journal import *
 from Crypto.PublicKey import RSA
 import os
 import glob
@@ -12,7 +11,7 @@ class EntriesEncryptionTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.path = 'test/'
+        cls.path = 'testData/'
         cls.file_name = 'encryped_entry'
         cls.journal_name = ".journal"
 
@@ -26,6 +25,9 @@ class EntriesEncryptionTests(unittest.TestCase):
 
         cls.entry = Entry("Some random text", None, cls.journal.identifier)
 
+        if not os.path.exists(cls.path):
+            os.mkdir(cls.path)
+
 
     @classmethod
     def tearDownClass(cls):
@@ -34,6 +36,7 @@ class EntriesEncryptionTests(unittest.TestCase):
         os.chdir(cls.path)
         for file in glob.glob("*.entry"):
             os.remove(file)
+        os.chdir('..')
 
     def test_encryption_should_be_lossless(self):
         chipertext = self.encryptor.encrypt_entry(self.entry)
